@@ -9,13 +9,9 @@ output:
     toc_depth: 2
     number_sections: yes
 header-includes:
- \usepackage{wrapfig}
+ # \usepackage{wrapfig}
  \usepackage{float}
  \floatplacement{figure}{H}
-  html_document:
-    toc: yes
-    toc_depth: '2'
-    df_print: paged
 bibliography: refs.bib
 ---
 
@@ -28,7 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-Prophet is a package available for R and Python that aims to facilitate the process of univariate time series modeling for those who doesn't have statistical background, but have knowledge from the data generation process. Model fitting can be done with just one line, but all the parameters can be tuned for a better suitability. This text aims to presents the mathematical backgroud of the packages and give soma practical examples.
+Prophet is a package available for R and Python that aims to facilitate the process of univariate time series modeling for those who don't have a statistical background but have knowledge from the data generation process. The model fitting can be done with just one line, but all the parameters can be tuned for better suitability. This text aims to present the mathematical background of the packages and give soma practical examples.
 
 # The Prophet Forecasting Model
 
@@ -68,7 +64,7 @@ $$\gamma_j=\left(s_j-m-\sum_{l<j}\gamma_l\right)\left(1-\dfrac{k + \sum_{l<j}\de
 
 ### Changepoint Selection and Uncertainty Forecast
 
-The changepoints can be defined manually by the user who approximately knows the dates when of growth changes in his business. If not specified, Prophet package will automatically select $S$ changepoints from the first $p\%$ of history data. By default $p=80$ but it can be set by the user.
+The changepoints can be defined manually by the user who approximately knows the dates when of growth changes in his business. If not specified, the Prophet package will automatically select $S$ changepoints from the first $p\%$ of history data. By default $p=80$ but it can be set by the user.
 
 The parameters $\delta_j$ are set to have the prior distribution $\operatorname{Laplace}(0,\tau)$. When $\tau\to0$, the growth function converges to its standard non-piecewise version, with constant growth rate $k$.
 
@@ -76,12 +72,12 @@ To extrapolate changepoints for out of sample forecasts, we use the maximum like
 
 $$\begin{cases}\delta_j = 0,\text{ with prob. }\frac{T-S}{T}\\ \delta_j\sim\operatorname{Laplace}(0,\lambda),\text{ with prob. } \frac S T\end{cases}$$
 
-With this distribution, we can make simulations and compute empirical uncertainty intervals. Note that as $\tau$ increases, the model has more flexibility to fit observed data, and consequently reducing in-sample error, but will have poor generalization power and simulations will produce large uncertainty intervals.
+With this distribution, we can make simulations and compute empirical uncertainty intervals. Note that as $\tau$ increases, the model has more flexibility to fit observed data, consequently reducing in-sample error, but will have poor generalization power and simulations will produce large uncertainty intervals.
 
 
 ## The Seasonality Model
 
-A common characteristics of time series is the seasonal component, for example, a retail company might observe a higher sales in the end of the year, because of people buying Christmas gifts; That's a pattern that repeats every year, so we add a periodic function with 1-year period to the model.
+A common characteristic of time series is the seasonal component, for example, a retail company might observe higher sales at the end of the year, because of people buying Christmas gifts; That's a pattern that repeats every year, so we add a periodic function with 1-year period to the model.
 
 Suppose that we have a $P$-periodic time series and we want to fit the seasonal pattern. The authors propose the following Fourier Series model:
 
@@ -92,11 +88,11 @@ This model has $2N$ parameters to fit. And we can summarize-it in the vector for
 $$\boldsymbol\beta=[a_1,b_1,\ldots,a_n,b_n]^{\intercal}\text{, and }$$ 
 
 $$X(t) = \left[\cos\left(\dfrac{2\pi (1)t}{P}\right), \sin\left(\dfrac{2\pi (1)t}{P}\right),\ldots,\cos\left(\dfrac{2\pi (n)t}{P}\right), \sin\left(\dfrac{2\pi (n)t}{P}\right)\right]$$
-In a Bayesian framework, the parameters are set to have the prior distribution $\boldsymbol\beta\sim\mathcal{N}(0,\sigma^2)$. The number of Fourier terms $N$, has to be set with care, because a large $N$ can potentially overfit the data.
+In a Bayesian framework, the parameters are set to have the prior distribution $\boldsymbol\beta\sim\mathcal{N}(0,\sigma^2)$. The number of Fourier terms $N$ has to be set with care because a large $N$ can potentially overfit the data.
 
 ## Holidays
 
-In many time series, holidays might cause big shocks and produce outliers. To address this issue, the function $h(t)$ is added to the general model. Suppose each year we have $L$ holidays and/or special events that affects our data. Let $i$ be a holiday, define $D_i$ as the set of time indexes of all past and future dates of holiday $i$. Then we just add an indicator variable of $t$ being in a holiday.
+In many time series, holidays might cause big shocks and produce outliers. To address this issue, the function $h(t)$ is added to the general model. Suppose each year we have $L$ holidays and/or special events that affect our data. Let $i$ be a holiday, define $D_i$ as the set of time indexes of all past and future dates of holiday $i$. Then we just add an indicator variable of $t$ being in a holiday.
 
 $$h(t)=\displaystyle\sum_{i=1}^L\kappa_i\cdot\boldsymbol{1}\{t\in D_i\}$$
 We can fit the coefficients, by introducing a regressor matrix the same way as before:
@@ -107,7 +103,7 @@ $$\boldsymbol\kappa=[\kappa_1,\ldots,\kappa_L]^\intercal$$
 
 # Bayesian Parameter Estimation
 
-There are a lot of parameters in Prophet model, $k$ and $m$ for growth rate and offset, the vector of growth changes $\boldsymbol\delta$, seasonal coefficients $\boldsymbol\beta$, holidays coefficients $\boldsymbol\kappa$.
+There are a lot of parameters in the Prophet model, $k$ and $m$ for growth rate and offset, the vector of growth changes $\boldsymbol\delta$, seasonal coefficients $\boldsymbol\beta$, holidays coefficients $\boldsymbol\kappa$.
 
 Using a Bayesian approach, we set normal priors to $k$ and $m$, Laplace prior to $\boldsymbol\delta$ as seen before, and for the other parameters, we combine seasonality and holidays regressors in a single matrix $\tilde X = [X,Z]^\intercal$, then we define $\boldsymbol{\tilde\beta} = [\boldsymbol\beta,\boldsymbol\kappa]^\intercal$. The we have the priors:
 
@@ -118,7 +114,7 @@ We can interpret the hyperparameters $\tau$ and $\sigma$ as regularization contr
 
 We assume a normal likelihood as a $T$-dimensional multivariate normal distribution $\mathcal{N}(G+\tilde X\boldsymbol{\tilde\beta},\varepsilon^2I)$, where $G$ is a matrix where the row $t$ in the growth function $g(t)$ which depends on $k,m,\boldsymbol\delta$, and whether the trend is linear or logistic. The variance $\varepsilon^2$ has its own normal prior too.
 
-The fitting algorithm is L-BFGS a well-known optimization algorithm that is implemented on Stan (source of Prophet model) and here it's used to find the parameters that maximizes the posterior distribution, given the above described priors and likelihood.
+The fitting algorithm is L-BFGS a well-known optimization algorithm that is implemented on Stan (source of Prophet model) and here it's used to find the parameters that maximize the posterior distribution, given the above-described priors and likelihood.
 
 
 # Estimating out-of-sample error
@@ -136,7 +132,7 @@ The idea is to isolate a part of the dataset $[T_1,T_2]$ (with $T_2-T_1\geq h$) 
 $$\hat\xi(h)=\dfrac{1}{T_2-T_1}\displaystyle\sum_{T=T_1}^{T_2} \phi(T,h)$$
 This method is often called expanding window, or rolling window if we drop the first point from training when adding a new one. Prophet also gives the option to set a period in the interval $[T_1,T_2]$ to avoid computing $\phi(T,h)$ for every forecast date.
 
-The following images, taken from [@hyndman-2016], illustrate this procedure. In the case of 1-step ahead forecast (Figure 1), we use the blue points to predict the red ones, and then compare with true values, computing error $\phi$ and averaging through time, to estimate $\xi(1)$. 
+The following images, taken from [@hyndman-2016], illustrate this procedure. In the case of a 1-step ahead forecast (Figure 1), we use the blue points to predict the red ones and then compare with true values, computing error $\phi$ and averaging through time, to estimate $\xi(1)$. 
 
 <!-- ![Figure 1: Expanding windows forecast for h=1](images/shf_h1.png) -->
 
@@ -144,7 +140,7 @@ The following images, taken from [@hyndman-2016], illustrate this procedure. In 
 knitr::include_graphics("images/shf_h1.png")
 ```
 
-If we aim to estimate $\xi(4)$, we must place the red points 4 steps ahead the last blue training point (Figure 2)
+If we aim to estimate $\xi(4)$, we must place the red points 4 steps ahead of the last blue training point (Figure 2)
 
 ```{r echo=FALSE, fig.align="center", fig.cap= "Expanding windows forecast for h=4", out.width="70%"}
 knitr::include_graphics("images/shf-h4.png")
@@ -178,7 +174,7 @@ We also can plot the automatically selected changepoints (Figure 5).
 plot(model, forecast) + add_changepoints_to_plot(model)
 ```
 
-A note on generalization: Phophet uses by default 25 changepoints candidates that are fitted in the first 80% of the data using the sparse prior $\operatorname{Laplace}(0,\tau)$, where $\tau=0.05$ by default. Larger values of $\tau$ may lead to poor generalization and consequently a large uncertainty interval. Figure 4 shows for different values of tau, the distribution of interval width along the 1-year forecast. As expected, larger $\tau$, produces more uncertainty.
+A note on generalization: Prophet uses by default 25 changepoints candidates that are fitted in the first 80% of the data using the sparse prior $\operatorname{Laplace}(0,\tau)$, where $\tau=0.05$ by default. Larger values of $\tau$ may lead to poor generalization and consequently a large uncertainty interval. Figure 4 shows for different values of tau, the distribution of interval width through the 1-year forecast. As expected, larger $\tau$ produces more uncertainty.
 
 
 ```{r echo=FALSE, fig.align="center", fig.cap="Uncertainty interval width by tau value", message=FALSE, warning=FALSE, out.width="70%"}
@@ -188,28 +184,29 @@ boxplot(tau_width,xlab = "tau",ylab = 'interval width')
 
 ## Benchmarks
 
-In Prophet`s paper the authors used Simulated Historical Forecasts in a time series of Facebook events, with has a lot of components well adressed by the package such as holiday shocks ans multiplie seasonality. Prophet model beats all othe time seires models for every horizon 
+In Prophet`s paper, the authors used Simulated Historical Forecasts in a time series of Facebook events, with has a lot of components well addressed by the package such as holiday shocks and multiple seasonality. Prophet model beats all other time series models for every horizon 
 
-Here we used a simpler time series: quarterly expenditure on cafes, restaurants and takeway food services in Australia (Figure 6 ) provided by fpp R package [@fpp].
+Here we used a simpler time series: quarterly expenditure on cafes, restaurants, and takeaway food services in Australia (Figure 6 ) provided by fpp R package [@fpp].
 
-```{r echo=FALSE, fig.align="center", fig.cap="Australian Cafes expendirure", message=FALSE, warning=FALSE, out.width="70%"}
+```{r echo=FALSE, fig.align="center", fig.cap="Australian Cafes expendirure", message=FALSE, warning=FALSE, out.width="60%"}
 library(fpp)
 data(cafe)
 plot(cafe,ylab="expenditure")
 ```
 
-Figure 7 shows  the results of Simulated Historical Forecasts (using log of timeseries), using RMSE, from horizons 2 to 20, and comparing Prophet with ARIMA and ETS models, two famous, simple and often powerful time series models. We can see that for low horizons, ARIMA is better than Prophet, which makes sense, since the time series has a very simple patters
+Figure 7 shows the results of Simulated Historical Forecasts (using the log of time-series), using RMSE, from horizons 2 to 10, and comparing Prophet with ARIMA and ETS models, two famous, simple, and often powerful time series models. We can see that in most of the horizons, ARIMA is better than Prophet, which makes sense, since the time series has very simple patterns.
 
-```{r echo=FALSE, fig.align="center", fig.cap="Benchmarks", message=FALSE, warning=FALSE, out.width="70%"}
+```{r echo=FALSE, fig.align="center", fig.cap="Benchmarks", message=FALSE, warning=FALSE, out.width="60%"}
 load('outputs/shf.rda')
 shf_prophet = shf$prophet
 plotdf = data.frame('horizon'=2:20)
 plotdf$prophet = shf_prophet$rmse
 plotdf$auto_arima = shf$auto_arima[-1]
 plotdf$ets = shf$ets[-1]
-plot(plotdf[,1],plotdf[,4],type='b',xlab='horizon',ylab='RMSE')
-lines(plotdf[,2],type='b',col=2,lty=2)
-lines(plotdf[,3],type='b',col=3,lty=3)
+plotdf = head(plotdf,9)
+plot(plotdf[,1],plotdf[,4],type='b',xlab='horizon',ylab='RMSE',ylim=c(0.05,0.145))
+lines(plotdf[,1],plotdf[,2],type='b',col=2,lty=2)
+lines(plotdf[,1],plotdf[,3],type='b',col=3,lty=3)
 legend('topleft', legend=c("ets", "prophet","auto.arima"),
        col=c(1,2,3), lty=1:3, cex=0.8)
 ```
