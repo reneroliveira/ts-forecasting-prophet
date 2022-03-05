@@ -1,7 +1,7 @@
 ---
 title: "Time Series Forecasting with Prophet"
 author: "Rener Oliveira"
-date: "February 22, 2021"
+date: "February 22, 2022"
 output:
   pdf_document:
     extra_dependencies: float
@@ -188,7 +188,7 @@ In Prophet`s paper, the authors used Simulated Historical Forecasts in a time se
 
 Here we used a simpler time series: quarterly expenditure on cafes, restaurants, and takeaway food services in Australia (Figure 6 ) provided by fpp R package [@fpp].
 
-```{r echo=FALSE, fig.align="center", fig.cap="Australian Cafes expendirure", message=FALSE, warning=FALSE, out.width="60%"}
+```{r echo=FALSE, fig.align="center", fig.cap="Australian Cafes expenditure", message=FALSE, warning=FALSE, out.width="60%"}
 library(fpp)
 data(cafe)
 plot(cafe,ylab="expenditure")
